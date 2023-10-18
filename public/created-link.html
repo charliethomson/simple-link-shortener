@@ -1,0 +1,18 @@
+{{define "created-link"}}
+    <div x-data="{
+        saveShortLink() {
+            const currentLinksRaw = localStorage.getItem('dPreviousLinks');
+            const currentLinks = currentLinksRaw?.length ? JSON.parse(currentLinksRaw) : [];
+            currentLinks.push({
+                id: '{{.Id}}',
+                shortUrl: '{{.ShortUrl}}',
+                longUrl: '{{.LongUrl}}',
+                createdAt: '{{.CreatedAt}}'
+            });
+            localStorage.setItem('dPreviousLinks', JSON.stringify(currentLinks));
+        }
+    }"
+         x-init="saveShortLink">
+        {{template "link" .Link}}
+    </div>
+{{end}}

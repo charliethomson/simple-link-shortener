@@ -1,0 +1,45 @@
+{{define "link"}}
+    <div class="text-slate-700 bg-slate-300 rounded-lg px-4 py-2 w-fit flex flex-col">
+        <button
+                class="self-end"
+                @click="() => {
+            const existingLinks = JSON.parse(localStorage.getItem('dPreviousLinks' ?? '[]'));
+            const filteredLinks = existingLinks.filter(link => link.id !== '{{.Id}}');
+            localStorage.setItem('dPreviousLinks', JSON.stringify(filteredLinks));
+            refreshCachedLinks();
+        }">
+            <i class="fa fa-solid fa-times"></i>
+            <span class="sr-only">remove url</span>
+        </button>
+        <div x-data="{
+            get baseUrl() { return location.href; },
+            hasCopied: false,
+            copyUrl() {
+                this.hasCopied = true;
+                navigator.clipboard.writeText(new URL('{{.ShortUrl}}', location.href).toString());
+                setTimeout(() => {
+                    this.hasCopied = false
+                }, 2000);
+            }
+        }"
+             class="gap-2">
+            <span class="whitespace-nowrap">
+                <span x-text="baseUrl"></span>{{.ShortUrl}}
+            </span>
+            <button id="action--copy-link"
+                    @click="copyUrl"
+                    :disabled="hasCopied"
+            >
+                <i class="fa" :class="hasCopied ? 'fa-check fa-solid' : 'fa-copy fa-regular'"></i>
+                <span class="sr-only">copy to clipboard</span>
+            </button>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <i class="fa fa-solid fa-arrow-right"></i>
+            <span>{{.LongUrl}}</span>
+        </div>
+
+
+    </div>
+{{end}}

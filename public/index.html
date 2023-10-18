@@ -1,0 +1,67 @@
+{{define "index"}}
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Hello, World!</title>
+        <script src="https://unpkg.com/htmx.org@1.9.6"
+                integrity="sha384-FhXw7b6AlE/jyjlZH5iHa/tTe9EpJ1Y55RjcgPbjeWMskSxZt1v9qkxLJWNJaGni"
+                crossorigin="anonymous"></script>
+        <script src="https://cdn.tailwindcss.com"></script>
+        <script src="https://kit.fontawesome.com/e6cf75fd73.js" crossorigin="anonymous"></script>
+        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    </head>
+    <body>
+    <div class="w-screen h-screen flex flex-col gap-8 p-8 bg-slate-900">
+        <form class="w-full flex flex-col gap-4" hx-post="/links" hx-target="#created-link" hx-swap="afterbegin">
+            <div class="flex w-full">
+                <div class="bg-slate-300 rounded-s-lg inline-flex flex-col w-full justify-center">
+                    <label for="input--shorten" class="sr-only">Shorten a link...</label>
+                    <input class="bg-transparent px-4 py-2 focus-visible:outline-none placeholder:text-slate-700 text-slate-900  placeholder:font-thin tracking-wide"
+                           id="input--shorten" name="url"
+                           placeholder="shorten a link..." type="text">
+                </div>
+                <button type="submit"
+                        class="w-fit px-4 py-2 bg-slate-500 border-slate-500 border border-2 rounded-e-lg text-slate-900 text-lg tracking-wide lowercase font-semibold">
+                    Shorten
+                </button>
+            </div>
+
+            <div class="flex w-full h-12 justify-between items-center">
+                <div class="w-[45%] bg-slate-300 flex flex-col justify-center h-full px-4 rounded-lg">
+                    <label for="input--custom" class="text-xs lowercase tracking-wide">Custom URL</label>
+
+                    <div class="flex" x-data="{ get baseUrl() { return location.href; }}">
+                        <span class="text-slate-900 tracking-wide" x-text="baseUrl" @click="$refs.inputCustom.focus()">
+                        </span>
+                        <input type="text" id="input--custom" name="customUrl"
+                               placeholder="hmmm..."
+                               maxlength="18"
+                               minlength="3"
+                               x-ref="inputCustom"
+                               class="bg-transparent focus-visible:outline-none placeholder:text-slate-700 placeholder:font-thin text-slate-900 tracking-wide">
+                    </div>
+                </div>
+                <span class="text-slate-300">- or -</span>
+                <div class="w-[45%] bg-slate-300 flex flex-col justify-center h-full px-4 rounded-lg">
+                    <label for="range--maxLength" class="text-xs lowercase tracking-wide">Max length</label>
+                    <input id="range--maxLength" type="number" min="3" max="50" name="maxLength" value="6"
+                           class="bg-transparent focus-visible:outline-none">
+                </div>
+            </div>
+
+        </form>
+
+        <hr class="w-[95%] h-0.5 bg-slate-300 mx-auto">
+
+        <div id="created-link" class="flex gap-4 flex-wrap"
+             x-data="{ cachedLinks: JSON.parse(localStorage.getItem('dPreviousLinks') ?? '[]'), refreshCachedLinks() { this.cachedLinks = JSON.parse(localStorage.getItem('dPreviousLinks') ?? '[]'); console.log(this.cachedLinks) }}">
+            <template x-for="link in cachedLinks" :key="link.id">
+                <div :hx-get="`/links/${link.id}`" hx-swap="innerHTML" hx-target="this" hx-trigger="load"></div>
+            </template>
+        </div>
+    </div>
+    </body>
+    </html>
+{{end}}
